@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Text to Speech Converter</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background-image: url('background-image.jpg'); /* Change 'background-image.jpg' to the path of your image */
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+        background-position: center;
+        color: #fff;
+    }
+    .container {
+        background-color: rgba(0, 0, 0, 0.7); /* Semi-transparent black background for better contrast with text */
+        padding: 20px;
+        border-radius: 10px;
+        max-width: 600px;
+        margin: 0 auto;
+        margin-top: 50px;
+    }
+    #text-input {
+        width: 100%;
+        padding: 10px;
+        font-size: 16px;
+        margin-bottom: 10px;
+    }
+    #convert-btn {
+        padding: 10px 20px;
+        font-size: 16px;
+        cursor: pointer;
+    }
+    #convert-btn.disabled {
+        background-color: #ccc;
+        cursor: not-allowed;
+    }
+</style>
+</head>
+<body>
+<div class="container">
+    <h1>Text to Speech Converter</h1>
+    <textarea id="text-input" placeholder="Enter text to convert"></textarea>
+    <button id="convert-btn">Convert to Speech</button>
+    <audio controls id="audio"></audio>
+</div>
+
+<script>
+    const textInput = document.getElementById('text-input');
+    const convertBtn = document.getElementById('convert-btn');
+    const audio = document.getElementById('audio');
+    let isConverting = false;
+    
+    convertBtn.addEventListener('click', () => {
+        if (!isConverting) {
+            const text = textInput.value.trim();
+            if (text !== '') {
+                convertBtn.textContent = 'Converting...';
+                isConverting = true;
+                convertTextToSpeech(text);
+            } else {
+                alert('Please enter some text to convert.');
+            }
+        } else {
+            resetConverter();
+        }
+    });
+    
+    function convertTextToSpeech(text) {
+        const speech = new SpeechSynthesisUtterance();
+        speech.text = text;
+        speech.volume = 1;
+        speech.rate = 1;
+        speech.pitch = 1;
+        speech.lang = 'en-US';
+        
+        speechSynthesis.speak(speech);
+        
+        speech.onend = () => {
+            const blob = new Blob([text], { type: 'audio/wav' });
+            const url = URL.createObjectURL(blob);
+            audio.src = url;
+            convertBtn.textContent = 'Play Again';
+            isConverting = false;
+            textInput.disabled = false;
+        };
+        
+        textInput.disabled = true;
+        convertBtn.classList.add('disabled');
+    }
+    
+    function resetConverter() {
+        convertBtn.textContent = 'Convert to Speech';
+        audio.src = '';
+        isConverting = false;
+        textInput.disabled = false;
+        convertBtn.classList.remove('disabled');
+    }
+</script>
+</body>
+</html>
